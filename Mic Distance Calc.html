@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speaker Mic and Reflection Distance Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .calculator {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input[type="number"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .result {
+            margin-top: 20px;
+        }
+        .instructions {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Speaker Distance Calculator</h1>
+    <div class="calculator">
+        <h3>Enter Speaker Diagonal:</h3>
+        <label for="diagonal">Diagonal of Speaker Face (meters):</label><br>
+        <input type="number" id="diagonal" placeholder="e.g., 1.5" step="0.01" required><br>
+
+        <button onclick="calculate()">Calculate</button>
+
+        <div class="result" id="result"></div>
+    </div>
+
+    <div class="instructions">
+        <h3>Instructions for Ground Plane Measurements (Using Smaart or REW)</h3>
+        <p>Ground plane measurements are a reliable way to measure loudspeakers, especially in non-anechoic environments. Below are best practices to ensure you capture accurate data:</p>
+
+        <ul>
+            <li><strong>Microphone Placement:</strong> Position the microphone directly on the ground, as close to the surface as possible. A small stand may be used to keep the microphone steady, but ensure it remains within a few centimeters of the ground.</li>
+            
+            <li><strong>Speaker Placement:</strong> Place the loudspeaker directly on the ground. This eliminates any early floor reflections, as the sound will bounce off the ground plane directly to the microphone.</li>
+            
+            <li><strong>Distance Calculation:</strong> Use the calculator above to determine the optimal microphone distance for a far-field measurement. For a typical ground plane measurement, you want to be in the far-field but not too far to introduce unwanted reflections.</li>
+
+            <li><strong>Time-Gating:</strong> Ensure your measurement software (such as Smaart or REW) is properly time-gated to eliminate any reflections from walls, ceilings, or other surfaces. By setting an appropriate time window, you can isolate the direct sound from the speaker and minimize the impact of room acoustics.</li>
+
+            <li><strong>Room Considerations:</strong> Perform the measurements in an outdoor or large space if possible, where reflections from walls and ceilings are minimal. If you're indoors, place absorption materials around reflective surfaces to reduce the impact of early reflections.</li>
+
+            <li><strong>SPL Levels:</strong> Keep SPL levels consistent and loud enough to avoid noise interference but not so loud that you introduce distortion. This helps maintain clarity in the measured frequency response.</li>
+        </ul>
+
+        <p>For a more detailed explanation on best practices for ground plane measurements, refer to <a href="https://www.prosoundtraining.com/2014/04/24/ground-plane-measurements/" target="_blank">this article by ProSoundTraining</a>.</p>
+    </div>
+
+    <script>
+        function calculate() {
+            // Get the input value
+            var diagonal = parseFloat(document.getElementById('diagonal').value);
+            
+            if (isNaN(diagonal)) {
+                alert('Please enter a valid number for the diagonal.');
+                return;
+            }
+
+            // Calculate the far-field distances (3x and 5x diagonal)
+            var minFarFieldDistance = 3 * diagonal; // Near-field to far-field transition point
+            var maxFarFieldDistance = 5 * diagonal; // Far-field upper limit
+
+            // Calculate reflection-free distance for -10 dB attenuation
+            var reflectedDistance10 = 3.16 * minFarFieldDistance; // Based on the lower distance
+            var reflectionFreeDistance10 = reflectedDistance10 / 2; // Half for the distance to reflective boundary
+
+            // Calculate reflection-free distance for -20 dB attenuation
+            var reflectedDistance20 = 10 * minFarFieldDistance; // Roughly 10x the lower distance for -20 dB
+            var reflectionFreeDistance20 = reflectedDistance20 / 2; // Half for the distance to reflective boundary
+
+            // Output the results
+            var resultText = `
+                <h4>Results:</h4>
+                <p><strong>Minimum Microphone Distance (Near-field to Far-field Transition):</strong> ${minFarFieldDistance.toFixed(2)} meters</p>
+                <p><strong>Maximum Microphone Distance (Far-field Upper Limit):</strong> ${maxFarFieldDistance.toFixed(2)} meters</p>
+                <p><strong>Recommended Distance from Reflective Boundary (-10 dB Reflection):</strong> ${reflectionFreeDistance10.toFixed(2)} meters</p>
+                <p><strong>Recommended Distance from Reflective Boundary (-20 dB Reflection):</strong> ${reflectionFreeDistance20.toFixed(2)} meters</p>
+            `;
+            document.getElementById('result').innerHTML = resultText;
+        }
+    </script>
+</body>
+</html>
